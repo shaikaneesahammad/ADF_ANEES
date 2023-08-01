@@ -1,0 +1,62 @@
+{
+	"name": "Aggrdataflow",
+	"properties": {
+		"description": "Aggreate and filter data flow",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "empdata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empAggrdata",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FITLER"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empdata",
+				"empdata filter(notEquals(lower(EMPNAME),'umar')) ~> FITLER",
+				"FITLER aggregate(groupBy(Status),",
+				"     empcount = count(EMPID),",
+				"          depidcount = count(DEPID)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     partitionFileNames:['aggrdataempstus.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

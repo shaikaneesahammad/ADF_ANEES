@@ -1,0 +1,55 @@
+{
+	"name": "windwlead",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EMPSALDATA",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "windwlasttrgt",
+						"type": "DatasetReference"
+					},
+					"name": "Trgt"
+				}
+			],
+			"transformations": [
+				{
+					"name": "window1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Employee ID } as string,",
+				"          {Fiscal year } as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 window(over({Employee ID }),",
+				"     asc({Fiscal year }, true),",
+				"     nxtyearsalry = lead(Salary, 1, 88888)) ~> window1",
+				"window1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Status as string,",
+				"          empcount as string,",
+				"          depidcount as string",
+				"     ),",
+				"     partitionFileNames:['windwkead.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Trgt"
+			]
+		}
+	}
+}

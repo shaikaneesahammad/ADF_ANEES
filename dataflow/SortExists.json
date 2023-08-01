@@ -1,0 +1,56 @@
+{
+	"name": "SortExists",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Empdataset"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empsort",
+						"type": "DatasetReference"
+					},
+					"name": "empdatasorted"
+				}
+			],
+			"transformations": [
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Empdataset",
+				"Empdataset sort(asc(EMPID, true),",
+				"     desc(Status, true),",
+				"     partitionBy('hash', 1)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Status as string,",
+				"          empcount as string,",
+				"          depidcount as string",
+				"     ),",
+				"     partitionFileNames:['empdatasorted.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> empdatasorted"
+			]
+		}
+	}
+}

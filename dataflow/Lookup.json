@@ -1,0 +1,75 @@
+{
+	"name": "Lookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Empdata"
+				},
+				{
+					"dataset": {
+						"referenceName": "depdataset",
+						"type": "DatasetReference"
+					},
+					"name": "depset"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "genrldataset",
+						"type": "DatasetReference"
+					},
+					"name": "empdeplookup"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> Empdata",
+				"source(output(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> depset",
+				"Empdata, depset lookup(Empdata@DEPID == depset@DEPID,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     asc(depset@DEPID, true),",
+				"     partitionBy('hash', 1),",
+				"     broadcast: 'right')~> lookup1",
+				"lookup1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Status as string,",
+				"          empcount as string,",
+				"          depidcount as string",
+				"     ),",
+				"     partitionFileNames:['lookup.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> empdeplookup"
+			]
+		}
+	}
+}

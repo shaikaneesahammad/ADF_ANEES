@@ -1,8 +1,8 @@
 {
-	"name": "empdatarep",
+	"name": "pivttrgrt",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage1",
+			"referenceName": "LS_TO_DEVSTRG",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "empdata.csv",
-				"folderPath": "input",
+				"fileName": "pivtrgr.csv",
+				"folderPath": "output",
 				"container": "devstrg"
 			},
 			"columnDelimiter": ",",
@@ -21,19 +21,35 @@
 		},
 		"schema": [
 			{
-				"name": "EMPID",
+				"name": "Month",
 				"type": "String"
 			},
 			{
-				"name": "EMPNAME",
+				"name": "ABC Corporation",
 				"type": "String"
 			},
 			{
-				"name": "DEPID",
+				"name": "Bridges Company",
 				"type": "String"
 			},
 			{
-				"name": "Status",
+				"name": "Chiral Corporation",
+				"type": "String"
+			},
+			{
+				"name": "Eagle Security",
+				"type": "String"
+			},
+			{
+				"name": "Sol Company",
+				"type": "String"
+			},
+			{
+				"name": "Timefall Inc.",
+				"type": "String"
+			},
+			{
+				"name": "Titan Industries",
 				"type": "String"
 			}
 		]

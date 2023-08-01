@@ -1,0 +1,96 @@
+{
+	"name": "selectuniondflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "empdata",
+					"description": "Employee data"
+				},
+				{
+					"dataset": {
+						"referenceName": "Mgrdata",
+						"type": "DatasetReference"
+					},
+					"name": "Mgrdata",
+					"description": "Manager data set"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "EmpunionMgrdata",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Selectempdata"
+				},
+				{
+					"name": "EMPunionMgr",
+					"description": "Combining data of emp and manager"
+				},
+				{
+					"name": "Selectmgrdata"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     rowUrlColumn: 'Filename') ~> empdata",
+				"source(output(",
+				"          MANAGERID as string,",
+				"          MGRNAME as string,",
+				"          DEPID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     rowUrlColumn: 'FILENAME') ~> Mgrdata",
+				"empdata select(mapColumn(",
+				"          EMPNAME,",
+				"          DEPID,",
+				"          Filename",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> Selectempdata",
+				"Selectempdata, Selectmgrdata union(byName: true)~> EMPunionMgr",
+				"Mgrdata select(mapColumn(",
+				"          MANAGERID,",
+				"          EMPNAME = MGRNAME,",
+				"          DEPID,",
+				"          Filename = FILENAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Selectmgrdata",
+				"EMPunionMgr sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     partitionFileNames:['empmgrdata3.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

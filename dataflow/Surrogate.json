@@ -1,0 +1,60 @@
+{
+	"name": "Surrogate",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "pivttrgrt",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Surgtrgt",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Month as string,",
+				"          {ABC Corporation} as string,",
+				"          {Bridges Company} as string,",
+				"          {Chiral Corporation} as string,",
+				"          {Eagle Security} as string,",
+				"          {Sol Company} as string,",
+				"          {Timefall Inc.} as string,",
+				"          {Titan Industries} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 keyGenerate(output(Primarykey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 2L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Status as string,",
+				"          empcount as string,",
+				"          depidcount as string",
+				"     ),",
+				"     partitionFileNames:['srgtrgt.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

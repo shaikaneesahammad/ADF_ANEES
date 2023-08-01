@@ -1,0 +1,75 @@
+{
+	"name": "Joindataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "empdata",
+					"description": "Employee data"
+				},
+				{
+					"dataset": {
+						"referenceName": "depdataset",
+						"type": "DatasetReference"
+					},
+					"name": "depdata",
+					"description": "Department data"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empdepdata",
+						"type": "DatasetReference"
+					},
+					"name": "Target",
+					"description": "Target data set"
+				}
+			],
+			"transformations": [
+				{
+					"name": "EmpjoinDep",
+					"description": "Joining emp and Department data"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empdata",
+				"source(output(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> depdata",
+				"empdata, depdata join(empdata@DEPID != depdata@DEPID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'left')~> EmpjoinDep",
+				"EmpjoinDep sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     partitionFileNames:['NONEQUINNER.CSV'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Target"
+			]
+		}
+	}
+}

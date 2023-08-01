@@ -1,0 +1,66 @@
+{
+	"name": "pivot",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "pivotsrc",
+						"type": "DatasetReference"
+					},
+					"name": "pivtdata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "pivttrgrt",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "pivot1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Date as date 'dd-MM-yyyy',",
+				"          Client as string,",
+				"          Region as string,",
+				"          Month as string,",
+				"          Year as string,",
+				"          Quarter as string,",
+				"          Amount as integer '$###,###'",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> pivtdata",
+				"pivtdata pivot(groupBy(Month),",
+				"     pivotBy(Client),",
+				"     {} = sum(Amount),",
+				"     columnNaming: '$N$V',",
+				"     lateral: true) ~> pivot1",
+				"pivot1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Month as string,",
+				"          {ABC Corporation} as string,",
+				"          {Bridges Company} as string,",
+				"          {Chiral Corporation} as string,",
+				"          {Eagle Security} as string,",
+				"          {Sol Company} as string,",
+				"          {Timefall Inc.} as string,",
+				"          {Titan Industries} as string",
+				"     ),",
+				"     partitionFileNames:['pivtrgr.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

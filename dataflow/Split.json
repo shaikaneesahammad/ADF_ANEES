@@ -1,0 +1,79 @@
+{
+	"name": "Split",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataset",
+						"type": "DatasetReference"
+					},
+					"name": "empdata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "resgnempl",
+						"type": "DatasetReference"
+					},
+					"name": "Resignedemp"
+				},
+				{
+					"dataset": {
+						"referenceName": "workemp",
+						"type": "DatasetReference"
+					},
+					"name": "workingemp"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				},
+				{
+					"name": "lowercolumns",
+					"description": "Changing status column to lowercase"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          Status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empdata",
+				"lowercolumns split(equals(Status, 'resigned'),",
+				"     equals(Status, 'working'),",
+				"     disjoint: false) ~> split1@(resigned, Working)",
+				"empdata derive(Status = iif(isNull(Status) ,'resigned', lower(Status))) ~> lowercolumns",
+				"split1@resigned sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     partitionFileNames:['resgndemp.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Resignedemp",
+				"split1@Working sink(allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     partitionFileNames:['workngemp.csv'],",
+				"     partitionBy('hash', 1)) ~> workingemp"
+			]
+		}
+	}
+}
