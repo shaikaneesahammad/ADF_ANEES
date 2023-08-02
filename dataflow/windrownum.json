@@ -46,10 +46,9 @@
 				"          empcount as string,",
 				"          depidcount as string",
 				"     ),",
-				"     partitionFileNames:['rownumbe.csv'],",
+				"     partitionFileNames:['rownum.csv'],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
