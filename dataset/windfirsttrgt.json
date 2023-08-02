@@ -1,8 +1,8 @@
 {
-	"name": "empdatarep",
+	"name": "windfirsttrgt",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage1",
+			"referenceName": "LS_TO_DEVSTRG",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "empdata.csv",
-				"folderPath": "input",
+				"fileName": "windfirsttrgt",
+				"folderPath": "output",
 				"container": "devstrg"
 			},
 			"columnDelimiter": ",",
@@ -19,24 +19,7 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "EMPID",
-				"type": "String"
-			},
-			{
-				"name": "EMPNAME",
-				"type": "String"
-			},
-			{
-				"name": "DEPID",
-				"type": "String"
-			},
-			{
-				"name": "Status",
-				"type": "String"
-			}
-		]
+		"schema": []
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

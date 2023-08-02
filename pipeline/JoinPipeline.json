@@ -1,0 +1,40 @@
+{
+	"name": "JoinPipeline",
+	"properties": {
+		"description": "Pipeline using pipe dataflow\n",
+		"activities": [
+			{
+				"name": "Joindataflow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "comments",
+						"value": "combining emp and department data"
+					}
+				],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Joindataflow",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-07-19T16:49:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

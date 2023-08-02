@@ -1,0 +1,9 @@
+{
+	"name": "devdfans",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a7383924-b461-48cd-89e9-8d7084116fb2",
+		"tenantId": "55a1a2d7-c6b4-4ff8-92ed-0d7b701760c0"
+	}
+}
